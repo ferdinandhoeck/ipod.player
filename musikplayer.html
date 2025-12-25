@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="de">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+    <title>iPod Classic</title>
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="iPod">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            background: #bfc3c7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        /* iPod Body */
+        .ipod {
+            width: 320px;
+            height: 560px;
+            background: linear-gradient(#fdfdfd, #e6e6e6);
+            border-radius: 28px;
+            box-shadow: inset 0 0 0 2px #ccc, 0 20px 40px rgba(0, 0, 0, .35);
+            display: flex;
+            flex-direction: column;
+            padding: 18px;
+        }
+
+        /* Screen */
+        .screen {
+            background: #e9edf1;
+            border-radius: 6px;
+            border: 2px solid #999;
+            height: 200px;
+            padding: 12px;
+            font-size: 14px;
+            overflow: hidden;
+        }
+
+        .status {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            margin-bottom: 6px;
+        }
+
+        .title {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .artist {
+            font-size: 12px;
+            opacity: .7;
+        }
+
+        /* Playlist */
+        .menu {
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        .menu div {
+            padding: 6px 4px;
+        }
+
+        .menu .active {
+            background: #1f6fd2;
+            color: #fff;
+        }
+
+        /* Click Wheel */
+        .wheel {
+            margin-top: auto;
+            align-self: center;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: #f8f8f8;
+            box-shadow: inset 0 0 0 2px #ccc;
+            position: relative;
+        }
+
+        /* Center Button */
+        .center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 80px;
+            height: 80px;
+            background: #f0f0f0;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: inset 0 0 0 2px #ccc;
+        }
+
+        /* Wheel Buttons */
+        .btn {
+            position: absolute;
+            font-size: 14px;
+            font-weight: 600;
+            color: #444;
+            user-select: none;
+        }
+
+        .menu-btn {
+            top: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .play-btn {
+            bottom: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .prev-btn {
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .next-btn {
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="ipod">
+
+        <div class="screen">
+            <div class="status">
+                <span>▶︎ Playing</span>
+                <span id="time">0:00</span>
+            </div>
+
+            <div class="title" id="title">Song 1</div>
+            <div class="artist" id="artist">Artist</div>
+
+            <div class="menu" id="menu"></div>
+        </div>
+
+        <div class="wheel">
+            <div class="btn menu-btn">MENU</div>
+            <div class="btn play-btn" onclick="toggle()">▶︎❚❚</div>
+            <div class="btn prev-btn" onclick="prev()">⏮</div>
+            <div class="btn next-btn" onclick="next()">⏭</div>
+            <div class="center"></div>
+        </div>
+
+        <audio id="audio"></audio>
+
+    </div>
+
+    <script>
+        const tracks = [
+            { title: "Song 1", artist: "Artist A", src: "musik/song1.mp3" },
+            { title: "Song 2", artist: "Artist B", src: "musik/song2.mp3" },
+            { title: "Song 3", artist: "Artist C", src: "musik/song3.mp3" }
+        ];
+
+        let index = 0;
+        const audio = document.getElementById("audio");
+        const title = document.getElementById("title");
+        const artist = document.getElementById("artist");
+        const menu = document.getElementById("menu");
+        const time = document.getElementById("time");
+
+        function load(i) {
+            index = (i + tracks.length) % tracks.length;
+            audio.src = tracks[index].src;
+            title.textContent = tracks[index].title;
+            artist.textContent = tracks[index].artist;
+            renderMenu();
+        }
+
+        function toggle() {
+            audio.paused ? audio.play() : audio.pause();
+        }
+
+        function next() {
+            load(index + 1);
+            audio.play();
+        }
+
+        function prev() {
+            load(index - 1);
+            audio.play();
+        }
+
+        audio.ontimeupdate = () => {
+            const m = Math.floor(audio.currentTime / 60);
+            const s = Math.floor(audio.currentTime % 60);
+            time.textContent = `${m}:${String(s).padStart(2, '0')}`;
+        };
+
+        function renderMenu() {
+            menu.innerHTML = tracks.map((t, i) => `
+    <div class="${i === index ? 'active' : ''}">
+      ${t.title}
+    </div>
+  `).join("");
+        }
+
+        load(0);
+    </script>
+
+</body>
+
+</html>
